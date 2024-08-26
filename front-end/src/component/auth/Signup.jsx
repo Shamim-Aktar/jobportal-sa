@@ -1,16 +1,18 @@
-import React from 'react'
-import Navbar from '../../component/shared/Navbar'
-import { TextField, Button, Box, Typography, FormControl, FormLabel } from '@mui/material';
+import React, { useState } from 'react';
+import Navbar from '../../component/shared/Navbar';
+import { TextField, Button, Box, Typography, FormControl, FormControlLabel, Radio, FormLabel, RadioGroup } from '@mui/material';
 
 const Signup = () => {
-
-    const [formValues, setFormValues] = React.useState({
-        username: '',
+    const [formValues, setFormValues] = useState({
+        fullname: '',
         email: '',
+        phoneNumber: '',
         password: '',
+        role: '',
+        file: ''
     });
 
-    const [errors, setErrors] = React.useState({});
+    const [errors, setErrors] = useState({});
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -20,18 +22,26 @@ const Signup = () => {
         });
     };
 
-    const validate = () => {
-        let tempErrors = {};
-        tempErrors.username = formValues.username ? "" : "Username is required.";
-        tempErrors.email = formValues.email ? "" : "Email is required.";
-        tempErrors.password = formValues.password ? "" : "Password is required.";
-        setErrors(tempErrors);
-        return Object.values(tempErrors).every(x => x === "");
+    const changeFileHandler = (e) => {
+        setFormValues({ ...formValues, file: e.target.files?.[0] });
     };
 
-    const handleSubmit = () => {
-        console.log('form')
-    }
+    const validate = () => {
+        let tempErrors = {};
+        tempErrors.fullname = formValues.fullname ? '' : 'Full Name is required.';
+        tempErrors.email = formValues.email ? '' : 'Email is required.';
+        tempErrors.password = formValues.password ? '' : 'Password is required.';
+        setErrors(tempErrors);
+        return Object.values(tempErrors).every((x) => x === '');
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validate()) {
+            console.log('userdata', formValues);
+        }
+    };
+
     return (
         <>
             <Navbar />
@@ -47,19 +57,19 @@ const Signup = () => {
                         boxShadow: 3,
                     }}
                 >
-                    <Typography variant="h5" gutterBottom sx={{ textAlign: 'center' }}  >
+                    <Typography variant="h5" gutterBottom sx={{ textAlign: 'center' }}>
                         Signup
                     </Typography>
                     <form onSubmit={handleSubmit}>
                         <FormControl fullWidth margin="normal">
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel>Full Name</FormLabel>
                             <TextField
                                 variant="outlined"
-                                name="username"
-                                value={formValues.username}
+                                name="fullname"
+                                value={formValues.fullname}
                                 onChange={handleInputChange}
-                                error={!!errors.username}
-                                helperText={errors.username}
+                                error={!!errors.fullname}
+                                helperText={errors.fullname}
                                 required
                             />
                         </FormControl>
@@ -72,6 +82,19 @@ const Signup = () => {
                                 onChange={handleInputChange}
                                 error={!!errors.email}
                                 helperText={errors.email}
+                                required
+                            />
+                        </FormControl>
+
+                        <FormControl fullWidth margin="normal">
+                            <FormLabel>Phone Number</FormLabel>
+                            <TextField
+                                variant="outlined"
+                                name="phoneNumber"
+                                value={formValues.phoneNumber}
+                                onChange={handleInputChange}
+                                error={!!errors.phoneNumber}
+                                helperText={errors.phoneNumber}
                                 required
                             />
                         </FormControl>
@@ -88,6 +111,26 @@ const Signup = () => {
                                 required
                             />
                         </FormControl>
+
+                        <FormControl fullWidth margin="normal">
+                            <FormLabel id="role">Role</FormLabel>
+                            <RadioGroup
+                                aria-labelledby="role"
+                                name="role"
+                                value={formValues.role}
+                                onChange={handleInputChange}
+                            >
+                                <FormControlLabel value="student" control={<Radio />} label="Student" />
+                                <FormControlLabel value="recruiter" control={<Radio />} label="Recruiter" />
+                            </RadioGroup>
+                        </FormControl>
+
+                        <FormLabel>Profile</FormLabel>
+                        <input
+                            accept="image/*"
+                            type="file"
+                            onChange={changeFileHandler}
+                        />
                         <Button
                             type="submit"
                             variant="contained"
@@ -101,7 +144,7 @@ const Signup = () => {
                 </Box>
             </div>
         </>
-    )
-}
+    );
+};
 
-export default Signup
+export default Signup;
