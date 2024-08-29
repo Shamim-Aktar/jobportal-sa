@@ -5,10 +5,12 @@ import bcrypt from 'bcryptjs'
 export const register = async (req, res) => {
     try {
         console.log(req.body)
-        const { fullname, email, phonenumber, password, role } = req.body
+        const { fullname, email, phoneNumber, password, role } = req.body
 
-        if (!fullname || !email || !phonenumber || !password || !role) {
-            return res.status(400).json({ message: 'Somehing missing', success: false })
+        console.log(fullname, email, phoneNumber, password, role)
+
+        if (!fullname || !email || !phoneNumber || !password || !role) {
+            return res.status(400).json({ message: 'Something missing', success: false })
         }
         const user = await User.findOne({ email })
         if (user) {
@@ -19,7 +21,7 @@ export const register = async (req, res) => {
         await User.create({
             fullname,
             email,
-            phonenumber,
+            phoneNumber,
             password: hashedPassword,
             role
         })

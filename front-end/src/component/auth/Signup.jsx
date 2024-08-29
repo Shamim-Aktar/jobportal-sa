@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import Navbar from '../../component/shared/Navbar';
-import { TextField, Button, Box, Typography, FormControl, FormControlLabel, Radio, FormLabel, RadioGroup } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+    TextField, Button,
+    Box, Typography,
+    FormControl, FormControlLabel,
+    Radio, FormLabel,
+    RadioGroup, Snackbar
+} from '@mui/material';
+import { USER_API_END_POINT } from '../../utils/constant.js';
+import axios from 'axios';
 
 const Signup = () => {
     const [formValues, setFormValues] = useState({
@@ -9,10 +18,13 @@ const Signup = () => {
         phoneNumber: '',
         password: '',
         role: '',
-        file: ''
+        file: null,  // Changed to null to better indicate no file
     });
 
     const [errors, setErrors] = useState({});
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const navigate = useNavigate();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -31,15 +43,52 @@ const Signup = () => {
         tempErrors.fullname = formValues.fullname ? '' : 'Full Name is required.';
         tempErrors.email = formValues.email ? '' : 'Email is required.';
         tempErrors.password = formValues.password ? '' : 'Password is required.';
+        tempErrors.phoneNumber = formValues.phoneNumber ? '' : 'Phone Number is required.';
+        tempErrors.role = formValues.role ? '' : 'Role is required.';
         setErrors(tempErrors);
-        return Object.values(tempErrors).every((x) => x === '');
+        return Object.values(tempErrors).every(x => x === '');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validate()) {
-            console.log('userdata', formValues);
+        if (!validate()) return;
+
+        const formData = new FormData();
+        formData.append("fullname", formValues.fullname);
+        formData.append("email", formValues.email);
+        formData.append("phoneNumber", formValues.phoneNumber);
+        formData.append("password", formValues.password);
+        formData.append("role", formValues.role);
+        if (formValues.file) {
+            formData.append("file", formValues.file);
         }
+        console.log('Form Data:', [...formData.entries()]);
+
+        try {
+            const res = await axios.post('http://localhost:3000/api/v1/user/register', formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            });
+
+            if (res.data.success) {
+                setSnackbarMessage(res.data.message);
+                setOpenSnackbar(true);
+                navigate("/login");
+            } else {
+                setSnackbarMessage(res.data.message || "Registration failed.");
+                setOpenSnackbar(true);
+            }
+        } catch (err) {
+            setSnackbarMessage(err.response?.data?.message || "An error occurred. Please try again.");
+            setOpenSnackbar(true);
+            console.error(err);
+        }
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
     };
 
     return (
@@ -125,12 +174,15 @@ const Signup = () => {
                             </RadioGroup>
                         </FormControl>
 
-                        <FormLabel>Profile</FormLabel>
-                        <input
-                            accept="image/*"
-                            type="file"
-                            onChange={changeFileHandler}
-                        />
+                        <FormControl fullWidth margin="normal">
+                            <FormLabel>Profile</FormLabel>
+                            <input
+                                accept="image/*"
+                                type="file"
+                                onChange={changeFileHandler}
+                            />
+                        </FormControl>
+
                         <Button
                             type="submit"
                             variant="contained"
@@ -142,6 +194,12 @@ const Signup = () => {
                         </Button>
                     </form>
                 </Box>
+                <Snackbar
+                    open={openSnackbar}
+                    autoHideDuration={5000}
+                    onClose={handleCloseSnackbar}
+                    message={snackbarMessage}
+                />
             </div>
         </>
     );
