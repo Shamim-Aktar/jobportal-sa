@@ -1,30 +1,44 @@
 import React, { useState } from 'react'
 import Navbar from '../../component/shared/Navbar'
-import { TextField, Button, Box, Typography, FormControl, FormControlLabel, Radio, FormLabel, RadioGroup } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { TextField, Button, Box, Typography, FormControl, FormControlLabel, Radio, FormLabel, RadioGroup, Snackbar } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading } from '../../../redux/authSlice';
 
 const Login = () => {
 
     const [formValues, setFormValues] = useState({
-        fullname: '',
+
         email: '',
-        phoneNumber: '',
         password: '',
         role: '',
-        file: ""
     });
 
+
+
     const [errors, setErrors] = useState({});
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormValues({
             ...formValues,
             [name]: value,
+            role: e.target.value,
         });
     };
 
-
+    // const handleInputChange = (event) => {
+    //     setFormValues({
+    //         ...formValues,
+    //         role: event.target.value,
+    //     });
+    // };
+    const { loading } = useSelector(store => store.auth)
+    const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const validate = () => {
         let tempErrors = {};
@@ -35,9 +49,36 @@ const Login = () => {
         return Object.values(tempErrors).every(x => x === "");
     };
 
-    const handleSubmit = () => {
-        console.log('form')
-    }
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        //if (!validate()) return;
+
+        try {
+
+            dispatch(setLoading(true))
+            const res = await axios.post('http://localhost:3000/api/v1/user/login', formValues, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                withCredentials: true,
+            });
+
+            if (res.data.success) {
+                setSnackbarMessage(res.data.message);
+                setOpenSnackbar(true);
+                navigate("/");
+            } else {
+                setSnackbarMessage(res.data.message || "login failed.");
+                setOpenSnackbar(true);
+            }
+        } catch (err) {
+            setSnackbarMessage(err.response?.data?.message || "An error occurred. Please try again.");
+            setOpenSnackbar(true);
+            console.error(err);
+        } finally {
+            dispatch(setLoading(false))
+        }
+    };
     return (
         <>
             <Navbar />
@@ -88,25 +129,36 @@ const Login = () => {
 
                         <FormControl>
                             <FormLabel id="student">Role</FormLabel>
-                            <RadioGroup
-                                aria-labelledby="demo-radio-buttons-group-label"
-                                defaultValue="female"
-                                name="radio-buttons-group"
-                            >
-                                <FormControlLabel value={formValues.role == 'student'} control={<Radio />} label="Student" />
-                                <FormControlLabel value={formValues.role == 'recruiter'} control={<Radio />} label="Recruiter" />
-                                {/* <FormControlLabel value="other" control={<Radio />} label="Other" /> */}
+                            <RadioGroup value={formValues.role} onChange={handleInputChange} name='role'>
+                                <FormControlLabel
+                                    value="student"
+                                    control={<Radio />}
+                                    label="Student"
+                                    name='student'
+                                />
+                                <FormControlLabel
+                                    value="recruiter"
+                                    control={<Radio />}
+                                    label="Recruiter"
+                                    name='recruiter'
+                                />
                             </RadioGroup>
                         </FormControl>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                        >
-                            Login
-                        </Button>
+                        {
+                            loading ? <button>loading</button> : <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                sx={{ marginTop: 2 }}
+                            >
+                                Login
+                            </Button>
+
+                        }
+
+
+
 
                         <span>Don't have an account? <Link to="/signup" >Signup</Link></span>
                     </form>
