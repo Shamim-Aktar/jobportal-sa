@@ -8,8 +8,10 @@ import {
     Radio, FormLabel,
     RadioGroup, Snackbar
 } from '@mui/material';
+import { setLoading } from '../../../redux/authSlice';
 import { USER_API_END_POINT } from '../../utils/constant.js';
 import axios from 'axios';
+import { useDispatch } from 'react-redux';
 
 const Signup = () => {
     const [formValues, setFormValues] = useState({
@@ -20,6 +22,9 @@ const Signup = () => {
         role: '',
         file: null,  // Changed to null to better indicate no file
     });
+
+    const { loading } = useSelector(store => store.auth)
+    const dispatch = useDispatch()
 
     const [errors, setErrors] = useState({});
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -65,6 +70,7 @@ const Signup = () => {
         console.log('Form Data:', [...formData.entries()]);
 
         try {
+            dispatch(setLoading(true))
             const res = await axios.post('http://localhost:3000/api/v1/user/register', formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -84,6 +90,10 @@ const Signup = () => {
             setSnackbarMessage(err.response?.data?.message || "An error occurred. Please try again.");
             setOpenSnackbar(true);
             console.error(err);
+        }
+
+        finally {
+            dispatch(setLoading(false))
         }
     };
 
@@ -183,15 +193,20 @@ const Signup = () => {
                             />
                         </FormControl>
 
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                            sx={{ marginTop: 2 }}
-                        >
-                            Sign Up
-                        </Button>
+
+
+                        {
+                            loading ? <button>loading</button> : <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                fullWidth
+                                sx={{ marginTop: 2 }}
+                            >
+                                Sign Up
+                            </Button>
+
+                        }
                     </form>
                 </Box>
                 <Snackbar
