@@ -1,6 +1,7 @@
-import { Typography, TextField } from '@mui/material'
+import { Typography, TextField, Button } from '@mui/material'
 import React from 'react'
 import './HeroSection.css'
+import SearchIcon from '@mui/icons-material/Search';
 
 
 const HeroSection = () => {
@@ -15,6 +16,14 @@ const HeroSection = () => {
             <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s</p>
 
             <TextField id="outlined-basic" label="Find your dream job" variant="outlined" />
+            <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{ marginTop: 2 }}
+            >
+                <SearchIcon />
+            </Button>
         </div>
     )
 }
