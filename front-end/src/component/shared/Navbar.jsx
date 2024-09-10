@@ -39,13 +39,13 @@ const Navbar = () => {
           </Typography>
           <Stack spacing={{ xs: 1, sm: 2 }} direction="row" useFlexGap flexWrap="wrap">
             <Typography variant="subtitle1" component="div"  >
-              Home
+              <Link to="/">Home</Link>
             </Typography>
             <Typography variant="subtitle1" component="div" >
-              Jobs
+              <Link to="/jobs">Jobs</Link>
             </Typography>
             <Typography variant="subtitle1" component="div" >
-              Browse
+              <Link to="/browse">Browse</Link>
             </Typography>
             {/* <Button color="inherit">Login</Button> */}
 

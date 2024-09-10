@@ -64,9 +64,11 @@ const Login = () => {
             });
 
             if (res.data.success) {
+                dispatch(res.data.user)
                 setSnackbarMessage(res.data.message);
                 setOpenSnackbar(true);
                 navigate("/");
+
             } else {
                 setSnackbarMessage(res.data.message || "login failed.");
                 setOpenSnackbar(true);
