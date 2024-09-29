@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import { AppBar, Box, Toolbar, Typography, Button, IconButton, Stack, Avatar, Popover } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { setLoading, setUser } from '../../../redux/authSlice';
 
 
 const Navbar = () => {
 
-  const user = false
+
+
+  const { user } = useSelector(store => store.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate()
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -81,7 +86,7 @@ const Navbar = () => {
                   }}
                 >
                   <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" />
-                  <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
+                  <Typography sx={{ p: 2 }}><Link to="/profile">View Profile</Link></Typography>
                 </Popover>
               )
             }

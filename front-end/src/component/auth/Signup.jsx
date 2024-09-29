@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'
 import Navbar from '../../component/shared/Navbar';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import {
     TextField, Button,
     Box, Typography,
@@ -11,7 +12,7 @@ import {
 import { setLoading } from '../../../redux/authSlice';
 import { USER_API_END_POINT } from '../../utils/constant.js';
 import axios from 'axios';
-import { useDispatch } from 'react-redux';
+
 
 const Signup = () => {
     const [formValues, setFormValues] = useState({
@@ -23,13 +24,16 @@ const Signup = () => {
         file: null,  // Changed to null to better indicate no file
     });
 
-    const { loading } = useSelector(store => store.auth)
-    const dispatch = useDispatch()
+    const { loading, user } = useSelector(store => store.auth);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [errors, setErrors] = useState({});
     const [openSnackbar, setOpenSnackbar] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const navigate = useNavigate();
+
+
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -100,6 +104,12 @@ const Signup = () => {
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
     };
+
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [])
 
     return (
         <>

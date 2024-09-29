@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Navbar from '../../component/shared/Navbar'
 import { TextField, Button, Box, Typography, FormControl, FormControlLabel, Radio, FormLabel, RadioGroup, Snackbar } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { setLoading } from '../../../redux/authSlice';
+import { setLoading, setUser } from '../../../redux/authSlice';
 
 const Login = () => {
 
@@ -36,7 +36,7 @@ const Login = () => {
     //         role: event.target.value,
     //     });
     // };
-    const { loading } = useSelector(store => store.auth)
+    const { loading, user } = useSelector(store => store.auth)
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
@@ -64,7 +64,7 @@ const Login = () => {
             });
 
             if (res.data.success) {
-                dispatch(res.data.user)
+                dispatch(setUser(res.data.user))
                 setSnackbarMessage(res.data.message);
                 setOpenSnackbar(true);
                 navigate("/");
@@ -81,6 +81,12 @@ const Login = () => {
             dispatch(setLoading(false))
         }
     };
+
+    useEffect(() => {
+        if (user) {
+            navigate("/");
+        }
+    }, [])
     return (
         <>
             <Navbar />
